@@ -215,12 +215,20 @@ hypermix/
 
 | ОС | Механизм | Устройство |
 |----|----------|------------|
-| Linux | `pactl load-module module-null-sink sink_name=HyperMix_Mic` | `HyperMix_Mic` |
+| Linux | `pactl load-module module-null-sink sink_name=HyperMix_Mic` | `HyperMix_Mic.monitor` |
 | Windows | VB-Audio Cable, вывод через `sounddevice` | `CABLE Input` → `CABLE Output` |
+
+Настройка Discord:
+
+- **Микрофон (вход):** `Monitor of HyperMix` на Linux или `CABLE Output` на Windows.
+- **Устройство вывода:** ваши наушники/колонки. **Не выбирайте** `HyperMix`
+  или `CABLE Input` как выход — иначе звук Discord/демонстрации экрана
+  попадёт обратно в виртуальный микрофон.
+- **Режим HyperMix:** `[MIC]` или `[BOTH]`. В режиме `[SPK]` звуки панели
+  идут только в колонки и в Discord не передаются.
 
 Linux: в режиме **[MIC]** / **[BOTH]** звук направляется через
 `pactl move-sink-input <stream_id> <virtual_id>` сразу после `.play()`.
-В Discord выберите **HyperMix_Microphone** как микрофон.
 
 Windows: звук сразу выводится на `CABLE Input`; в Discord выберите
 **CABLE Output** как микрофон.
