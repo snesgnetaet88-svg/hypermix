@@ -19,8 +19,10 @@ from pathlib import Path
 
 # Имя виртуального sink'а (null-sink) — микрофон для остальных программ
 VIRTUAL_SINK = "HyperMix_Mic"
-# Источник (source) виртуального микрофона, который слушают программы
-VIRTUAL_SOURCE = "HyperMix_Mic.monitor"
+# Обычный (не monitor) источник для Discord/игр — remap с микрофона sink'а.
+# Discord плохо выбирает monitor-источники, поэтому отдаём ему нормальный mic.
+VIRTUAL_SOURCE = "HyperMix_Microphone"
+VIRTUAL_MONITOR = f"{VIRTUAL_SINK}.monitor"
 SINK_DESCRIPTION = "HyperMix Virtual Microphone"
 # Файл, где запоминаем РЕАЛЬНЫЙ микрофон пользователя: после перезапуска
 # default source уже указывает на виртуальный мик, и без этого мы
@@ -100,6 +102,49 @@ def create_virtual_sink() -> bool:
     return True
 
 
+def virtual_source_exists() -> bool:
+    """Существует ли обычный источник HyperMix_Microphone."""
+    return VIRTUAL_SOURCE in list_sources()
+
+
+def create_virtual_source() -> bool:
+    """Создаёт обычный capture-источник HyperMix_Microphone из monitor'а sink'а."""
+    if virtual_source_exists():
+        return True
+    if not virtual_sink_exists() or not pactl_available():
+        return False
+    res = _run([
+        "pactl", "load-module", "module-remap-source",
+        f"master={VIRTUAL_MONITOR}",
+        f"source_name={VIRTUAL_SOURCE}",
+        f"source_properties=device.description={VIRTUAL_SOURCE}",
+    ])
+    if res.returncode != 0:
+        return virtual_source_exists()
+    return True
+
+
+def destroy_virtual_source() -> bool:
+    """Выгружает module-remap-source HyperMix_Microphone (если он наш)."""
+    if not pactl_available():
+        return False
+    res = _run(["pactl", "list", "short", "modules"])
+    if res.returncode != 0:
+        return False
+    for line in res.stdout.splitlines():
+        if "module-remap-source" not in line:
+            continue
+        if f"source_name={VIRTUAL_SOURCE}" in _module_args(line):
+            module_id = line.split("\t")[0].strip()
+            return _run(["pactl", "unload-module", module_id]).returncode == 0
+    return False
+
+
+def active_virtual_source() -> str:
+    """Источник, который нужно отдавать Discord: remap, иначе monitor."""
+    return VIRTUAL_SOURCE if virtual_source_exists() else VIRTUAL_MONITOR
+
+
 def destroy_virtual_sink() -> bool:
     """
     Выгружает модуль null-sink, созданный нами.
@@ -152,18 +197,20 @@ def get_default_source() -> str:
 
 def real_capture_sources() -> list[str]:
     """
-    Реальные микрофоны (без .monitor) — источники, с которых можно
-    снимать голос говорящего.
+    Реальные микрофоны (без .monitor и без наших виртуальных источников).
     """
-    return [s for s in list_sources() if not s.endswith(".monitor")]
+    return [
+        s for s in list_sources()
+        if not s.endswith(".monitor") and not s.startswith(VIRTUAL_SINK)
+    ]
 
 
 def is_real_capture_source(name: str) -> bool:
     """Проверяет, что источник — реальный микрофон (а не monitor/виртуальный)."""
     if not name or name.endswith(".monitor"):
         return False
-    # наш собственный виртуальный микрофон исключаем (иначе петля)
-    if name.startswith(VIRTUAL_SINK):
+    # наши виртуальные источники исключаем (иначе петля/эхо)
+    if name == VIRTUAL_SOURCE or name.startswith(VIRTUAL_SINK):
         return False
     return name in real_capture_sources()
 
@@ -393,16 +440,17 @@ def move_all_app_inputs_to_virtual(app_pattern: str = "HyperMix") -> int:
 
 
 def ensure_virtual_mic() -> bool:
-    """Гарантирует наличие виртуального микрофона (вызывается при старте на Linux)."""
+    """Гарантирует наличие sink'а и обычного источника HyperMix_Microphone."""
     if not pactl_available():
         return False
-    if virtual_sink_exists():
-        return True
-    return create_virtual_sink()
+    if not virtual_sink_exists() and not create_virtual_sink():
+        return False
+    return create_virtual_source()
 
 
 def cleanup_virtual_mic():
-    """Выгружает виртуальный микрофон (вызывается при закрытии приложения)."""
+    """Выгружает виртуальный источник и sink (вызывается при закрытии)."""
+    destroy_virtual_source()
     if virtual_sink_exists():
         destroy_virtual_sink()
 

@@ -21,6 +21,7 @@ class PlatformManager:
         self.virtual_mic_ready = False   # Linux: HyperMix_Mic создан
         self.cable_ready = False         # Windows: CABLE Input найден
         self._linux_module_loaded = False
+        self._linux_source_loaded = False
         self._voice_loopback_loaded = False
         self._previous_default_source = ""
         self._voice_source = ""
@@ -55,6 +56,13 @@ class PlatformManager:
         else:
             return "Не удалось создать виртуальный микрофон HyperMix_Mic"
 
+        # --- Обычный источник для Discord (remap с monitor'а) ---
+        source_preexisting = linux_audio.virtual_source_exists()
+        source_ok = linux_audio.create_virtual_source()
+        self._linux_source_loaded = source_ok and not source_preexisting
+        if not source_ok:
+            print("MIC: не удалось создать HyperMix_Microphone — fallback на monitor")
+
         # --- Подмешиваем голос говорящего в виртуальный микрофон ---
         # Сначала определяем РЕАЛЬНЫЙ микрофон — до переключения default
         # source на наш виртуальный. Если default уже указывает на виртуальный
@@ -69,7 +77,8 @@ class PlatformManager:
         self._voice_source = voice_source
 
         # --- Делаем наш микрофон микрофоном по умолчанию ---
-        default_ok = linux_audio.set_default_source(linux_audio.VIRTUAL_SOURCE)
+        default_ok = linux_audio.set_default_source(
+            linux_audio.active_virtual_source())
 
         parts = []
         if self._linux_module_loaded:
@@ -83,7 +92,7 @@ class PlatformManager:
         else:
             parts.append("реальный микрофон не найден — только звуки")
         if default_ok:
-            parts.append("выбран микрофоном по умолчанию")
+            parts.append(f"микрофон по умолчанию: {linux_audio.active_virtual_source()}")
         return "; ".join(parts)
 
     def _startup_windows(self, parent=None) -> str:
@@ -116,6 +125,9 @@ class PlatformManager:
             if self._voice_loopback_loaded:
                 linux_audio.destroy_voice_loopback()
                 self._voice_loopback_loaded = False
+            if self._linux_source_loaded:
+                linux_audio.destroy_virtual_source()
+                self._linux_source_loaded = False
             if self._linux_module_loaded:
                 linux_audio.destroy_virtual_sink()
                 self.virtual_mic_ready = False
@@ -152,7 +164,7 @@ class PlatformManager:
         if self.system.startswith("linux"):
             if self.virtual_mic_ready:
                 voice = " + голос" if self._voice_loopback_loaded else " (без голоса)"
-                return f"Микрофон: {linux_audio.VIRTUAL_SOURCE}{voice} ✔"
+                return f"Микрофон: {linux_audio.active_virtual_source()}{voice} ✔"
             return "Микрофон: —"
         if self.system.startswith("win"):
             if self.cable_ready:
@@ -183,10 +195,7 @@ class PlatformManager:
     def current_voice_source(self) -> str:
         """Текущий микрофон, с которого берётся голос."""
         if self.system.startswith("linux"):
-            try:
-                return linux_audio.get_default_source()
-            except Exception:
-                return ""
+            return self._voice_source or linux_audio._load_saved_voice_source()
         if self.system.startswith("win") and self.engine is not None:
             return self.engine.voice_source_name()
         return ""
@@ -203,6 +212,8 @@ class PlatformManager:
             linux_audio.destroy_voice_loopback()
             ok = linux_audio.ensure_voice_loopback(source)
             self._voice_loopback_loaded = ok
+            if ok:
+                self._voice_source = source
             return ok
         if self.system.startswith("win"):
             if self.engine is None or not self.engine.set_voice_source(source):
@@ -229,4 +240,4 @@ class PlatformManager:
         """Делает HyperMix_Mic.monitor микрофоном по умолчанию."""
         if not self.system.startswith("linux"):
             return False
-        return linux_audio.set_default_source(linux_audio.VIRTUAL_SOURCE)
+        return linux_audio.set_default_source(linux_audio.active_virtual_source())
