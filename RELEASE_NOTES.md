@@ -12,8 +12,9 @@ HyperMix — портативная звуковая панель с глоба�
 | Файл | Назначение |
 |------|------------|
 | `HyperMix-1.0.0-Linux-x86_64.tar.gz` | готовый Linux-бинарник |
-| `HyperMix-1.0.0-Windows-build-kit.zip` | исходники + сборка Windows exe |
+| `HyperMix-1.0.0-Windows-x86_64.zip` | готовый Windows exe |
 | `HyperMix-1.0.0-source.tar.gz` | исходники релиза |
+| `HyperMix-1.0.0-Windows-build-kit.zip` | опционально: сборка exe на Windows |
 | `SHA256SUMS` | контрольные суммы |
 
 Проверка:
@@ -36,18 +37,16 @@ cd HyperMix-1.0.0-Linux-x86_64
   KGlobalAccel.
 - Виртуальный микрофон `HyperMix_Mic` создаётся при запуске и удаляется при
   закрытии.
-- Сборка сделана на glibc 2.44 (Arch Linux). На старых системах
-  (например, Ubuntu 20.04) используйте исходники и `./build_linux.sh`.
+- Сборка сделана в GitHub Actions на Ubuntu 22.04 (glibc 2.35).
+  На Ubuntu 20.04 и старше используйте исходники и `./build_linux.sh`.
 
 ## Windows
 
-Готовый Windows `.exe` собирается на Windows: PyInstaller не умеет
-кросс-компилировать с Linux.
+1. Скачайте `HyperMix-1.0.0-Windows-x86_64.zip` и распакуйте в любую папку.
+2. Запустите `HyperMix.exe` — Python и установка не нужны.
 
-1. Распакуйте `HyperMix-1.0.0-Windows-build-kit.zip`.
-2. Установите Python 3.10+ (галочка «Add python.exe to PATH»).
-3. Запустите `build_windows.bat`.
-4. Получите `release\HyperMix-1.0.0-Windows-x86_64.zip` с `HyperMix.exe`.
+Сборка автоматизирована в GitHub Actions; локально на Windows можно
+запустить `build_windows.bat`.
 
 Для работы:
 - установите VB-Audio Cable: https://vb-audio.com/Cable/
@@ -72,9 +71,10 @@ cd HyperMix-1.0.0-Linux-x86_64
 
 - Windows-сборка не подписана сертификатом: SmartScreen может показать
   предупреждение. Выберите «Подробнее» → «Выполнить в любом случае».
-- Готовый Windows exe не проверен на реальном оборудовании в этом окружении;
-  проверка выполнялась на Linux + эмуляция PortAudio.
-- Для Linux-бинарника нужна система с glibc не старше сборочной.
+- Windows exe прошёл автоматический smoke-тест (`--check`), но не проверялся
+  на реальном VB-Cable и микрофоне в этом окружении.
+- Для Linux-бинарника нужна glibc 2.35 или новее (Ubuntu 22.04+, Debian 12+,
+  Arch, Fedora 36+).
 
 ## Лицензия
 

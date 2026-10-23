@@ -34,13 +34,13 @@
 | ОС | Файл | Что внутри |
 |----|------|------------|
 | Linux x86_64 | `HyperMix-1.0.0-Linux-x86_64.tar.gz` | готовый бинарник, `config.json`, README |
-| Windows 10/11 x86_64 | `HyperMix-1.0.0-Windows-x86_64.zip` | собирается на Windows скриптом `build_windows.bat` |
+| Windows 10/11 x86_64 | `HyperMix-1.0.0-Windows-x86_64.zip` | готовый `HyperMix.exe`, `config.json`, README |
 | Исходники | `HyperMix-1.0.0-source.tar.gz` | весь код и скрипты сборки |
-| Windows build-kit | `HyperMix-1.0.0-Windows-build-kit.zip` | исходники + `BUILD_WINDOWS.txt` + `build_windows.bat` |
+| Windows build-kit | `HyperMix-1.0.0-Windows-build-kit.zip` | опционально: сборка exe на Windows |
 
-> Windows `.exe` нельзя собрать на Linux (PyInstaller не поддерживает
-> кросс-компиляцию). В релизе приложен build-kit: на Windows запустите
-> `build_windows.bat` — получится готовый `HyperMix-1.0.0-Windows-x86_64.zip`.
+Windows `.exe` собирается автоматически в GitHub Actions (workflow
+**Build release**) и проверяется smoke-тестом. Локальная сборка на Windows:
+`build_windows.bat` → `release\HyperMix-1.0.0-Windows-x86_64.zip`.
 
 Проверка целостности:
 ```bash
@@ -67,10 +67,11 @@ sudo apt install libxcb-cursor0 libxkbcommon-x11-0 libegl1 libgl1 libpulse0
 
 ### Windows — запуск
 
-1. Распакуйте ZIP в любую папку.
-2. Установите **VB-Cable**: https://vb-audio.com/Cable/ и перезагрузитесь.
-3. Запустите `HyperMix.exe`.
-4. В Discord/игре выберите микрофон **CABLE Output**.
+1. Скачайте `HyperMix-1.0.0-Windows-x86_64.zip` из последнего релиза.
+2. Распакуйте в любую папку.
+3. Установите **VB-Cable**: https://vb-audio.com/Cable/ и перезагрузитесь.
+4. Запустите `HyperMix.exe`.
+5. В Discord/игре выберите микрофон **CABLE Output**.
 
 `HyperMix.exe` не требует Python и установки. SmartScreen может показать
 предупреждение об неизвестном издателе — нажмите «Подробнее» → «Выполнить
