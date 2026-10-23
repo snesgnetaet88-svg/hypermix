@@ -29,18 +29,18 @@
 
 ---
 
-## Релиз 1.0.1
+## Релиз 1.0.2
 
 | ОС | Файл | Что внутри |
 |----|------|------------|
-| Linux x86_64 | `HyperMix-1.0.1-Linux-x86_64.tar.gz` | готовый бинарник, `config.json`, README |
-| Windows 10/11 x86_64 | `HyperMix-1.0.1-Windows-x86_64.zip` | готовый `HyperMix.exe`, `config.json`, README |
-| Исходники | `HyperMix-1.0.1-source.tar.gz` | весь код и скрипты сборки |
-| Windows build-kit | `HyperMix-1.0.1-Windows-build-kit.zip` | опционально: сборка exe на Windows |
+| Linux x86_64 | `HyperMix-1.0.2-Linux-x86_64.tar.gz` | готовый бинарник, `config.json`, README |
+| Windows 10/11 x86_64 | `HyperMix-1.0.2-Windows-x86_64.zip` | готовый `HyperMix.exe`, `config.json`, README |
+| Исходники | `HyperMix-1.0.2-source.tar.gz` | весь код и скрипты сборки |
+| Windows build-kit | `HyperMix-1.0.2-Windows-build-kit.zip` | опционально: сборка exe на Windows |
 
 Windows `.exe` собирается автоматически в GitHub Actions (workflow
 **Build release**) и проверяется smoke-тестом. Локальная сборка на Windows:
-`build_windows.bat` → `release\HyperMix-1.0.1-Windows-x86_64.zip`.
+`build_windows.bat` → `release\HyperMix-1.0.2-Windows-x86_64.zip`.
 
 Проверка целостности:
 ```bash
@@ -50,8 +50,8 @@ sha256sum -c SHA256SUMS
 ### Linux — запуск
 
 ```bash
-tar -xzf HyperMix-1.0.1-Linux-x86_64.tar.gz
-cd HyperMix-1.0.1-Linux-x86_64
+tar -xzf HyperMix-1.0.2-Linux-x86_64.tar.gz
+cd HyperMix-1.0.2-Linux-x86_64
 ./HyperMix
 ```
 
@@ -67,7 +67,7 @@ sudo apt install libxcb-cursor0 libxkbcommon-x11-0 libegl1 libgl1 libpulse0
 
 ### Windows — запуск
 
-1. Скачайте `HyperMix-1.0.1-Windows-x86_64.zip` из последнего релиза.
+1. Скачайте `HyperMix-1.0.2-Windows-x86_64.zip` из последнего релиза.
 2. Распакуйте в любую папку.
 3. Установите **VB-Cable**: https://vb-audio.com/Cable/ и перезагрузитесь.
 4. Запустите `HyperMix.exe`.
@@ -82,13 +82,13 @@ sudo apt install libxcb-cursor0 libxkbcommon-x11-0 libegl1 libgl1 libpulse0
 Linux:
 ```bash
 ./build_linux.sh
-# → release/HyperMix-1.0.1-Linux-x86_64.tar.gz
+# → release/HyperMix-1.0.2-Linux-x86_64.tar.gz
 ```
 
 Windows (собирать **на Windows**):
 ```bat
 build_windows.bat
-:: → release\HyperMix-1.0.1-Windows-x86_64.zip
+:: → release\HyperMix-1.0.2-Windows-x86_64.zip
 ```
 
 ---
@@ -160,7 +160,7 @@ python main.py
 build_windows.bat
 ```
 Скрипт сам установит зависимости и соберёт
-`release\HyperMix-1.0.1-Windows-x86_64.zip` (внутри — `HyperMix.exe`).
+`release\HyperMix-1.0.2-Windows-x86_64.zip` (внутри — `HyperMix.exe`).
 
 > **Важно:** HyperMix **не устанавливает** драйверы скрытно.
 
@@ -224,7 +224,7 @@ hypermix/
 
 - **Микрофон (вход):** `HyperMix_Microphone` на Linux или `CABLE Output` на Windows.
   В старых сборках 1.0.0 Linux-вход назывался `Monitor of HyperMix` —
-  обновитесь до 1.0.1, Discord плохо выбирает monitor-источники.
+  обновитесь до 1.0.2, Discord плохо выбирает monitor-источники.
 - **Устройство вывода:** ваши наушники/колонки. **Не выбирайте** `HyperMix`,
   `HyperMixCombine` или `CABLE Input` как выход — иначе звук Discord и
   демонстрации экрана попадёт обратно в виртуальный микрофон.

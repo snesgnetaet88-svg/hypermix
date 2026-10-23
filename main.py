@@ -67,6 +67,7 @@ def main() -> int:
     status = platform_mgr.startup(parent=window)
     window.notify(status)
     window.update_platform_status()
+    window.restore_mode()
 
     if sys.platform.startswith("win"):
         # Windows: set_wakeup_fd недоступен; очистка идёт из closeEvent.

@@ -724,7 +724,7 @@ class MainWindow(QMainWindow):
         else:
             self.notify(f"Не удалось переключить источник на {chosen}")
 
-    def _set_mode(self, mode: str):
+    def _set_mode(self, mode: str, persist: bool = True, notify: bool = True):
         if mode in ("mic", "both") and self.platform is not None:
             if not self.platform.mic_mode_available():
                 self.notify("Виртуальный микрофон недоступен")
@@ -736,7 +736,23 @@ class MainWindow(QMainWindow):
         self.btn_both.setChecked(mode == "both")
         labels = {"speakers": "[SPK]", "mic": "[MIC]", "both": "[BOTH]"}
         self.lbl_mode.setText(f"Mode: {labels[mode]}")
-        self.notify(f"Mode: {labels[mode]}")
+        if persist:
+            cfg = load_config()
+            cfg["output_mode"] = mode
+            save_config(cfg)
+        if notify:
+            self.notify(f"Mode: {labels[mode]}")
+
+    def restore_mode(self):
+        """Восстанавливает режим вывода из config.json после startup платформы."""
+        mode = load_config().get("output_mode", "speakers")
+        if mode not in ("speakers", "mic", "both"):
+            mode = "speakers"
+        if mode in ("mic", "both") and (
+            self.platform is None or not self.platform.mic_mode_available()
+        ):
+            mode = "speakers"
+        self._set_mode(mode, persist=False, notify=False)
 
     def _on_volume_changed(self, value: int):
         self.lbl_volume_val.setText(f"{value}%")
