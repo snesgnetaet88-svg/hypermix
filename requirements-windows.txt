@@ -1,0 +1,8 @@
+PyQt6>=6.7
+pygame-ce>=2.5
+sounddevice>=0.4.7
+soundfile>=0.12.1
+numpy>=1.26
+pynput>=1.7.7
+pydub>=0.25
+audioop-lts>=0.2; python_version >= "3.13"

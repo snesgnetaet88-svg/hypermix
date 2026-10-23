@@ -1,0 +1,19 @@
+# Runtime / user data
+config.json
+.~lock.*
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.build-venv-linux/
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# Release artifacts (публикуются через GitHub Releases)
+release/

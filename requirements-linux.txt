@@ -1,0 +1,5 @@
+PyQt6>=6.7
+pygame-ce>=2.5
+pydub>=0.25
+dbus-next>=0.2.3
+audioop-lts>=0.2; python_version >= "3.13"

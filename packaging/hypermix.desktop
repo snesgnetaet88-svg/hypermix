@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=HyperMix
+GenericName=Audio Mixer & Soundboard
+Comment=Soundboard with virtual microphone and global hotkeys
+Exec=HyperMix
+Icon=hypermix
+Terminal=false
+Categories=AudioVideo;Audio;
+Keywords=soundboard;mixer;microphone;audio;
